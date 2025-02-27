@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@discord-tickets/settings':
-        specifier: ~2.5.3
-        version: 2.5.3
+        specifier: git+https://github.com/strata-czasu/discord-tickets-portal.git#feat/category-button-styles
+        version: https://codeload.github.com/strata-czasu/discord-tickets-portal/tar.gz/db51114bceccbe4fc6d4a2a4a5e47592143443f7
       '@eartharoid/dbf':
         specifier: ^0.4.2
         version: 0.4.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -248,8 +248,9 @@ packages:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
 
-  '@discord-tickets/settings@2.5.3':
-    resolution: {integrity: sha512-CG60Zq8rJFfA/44LzLCS9HLr56tWsvaA+o7gyDR1YxA9kXGawkLz3v3tv3m+1SknOAcxbelaBeEKEcVYxqFSog==}
+  '@discord-tickets/settings@https://codeload.github.com/strata-czasu/discord-tickets-portal/tar.gz/db51114bceccbe4fc6d4a2a4a5e47592143443f7':
+    resolution: {tarball: https://codeload.github.com/strata-czasu/discord-tickets-portal/tar.gz/db51114bceccbe4fc6d4a2a4a5e47592143443f7}
+    version: 2.5.3
 
   '@discordjs/builders@1.10.1':
     resolution: {integrity: sha512-OWo1fY4ztL1/M/DUyRPShB4d/EzVfuUvPTRRHRIt/YxBrUYSz0a+JicD5F5zHFoNs2oTuWavxCOVFV1UljHTng==}
@@ -2581,7 +2582,7 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
-  '@discord-tickets/settings@2.5.3': {}
+  '@discord-tickets/settings@https://codeload.github.com/strata-czasu/discord-tickets-portal/tar.gz/db51114bceccbe4fc6d4a2a4a5e47592143443f7': {}
 
   '@discordjs/builders@1.10.1':
     dependencies:
