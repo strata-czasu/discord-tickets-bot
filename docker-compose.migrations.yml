@@ -1,0 +1,29 @@
+# Stack for creating migrations for MySQL and PostgreSQL databases
+
+services:
+  mysql:
+    image: mysql:8
+    restart: unless-stopped
+    volumes:
+      - /var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      # DB_CONNECTION_URL=mysql://root:pass@localhost/tickets
+      MYSQL_USER: tickets
+      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: tickets
+
+  postgres:
+    image: postgres:13
+    restart: unless-stopped
+    volumes:
+      - /var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      # DB_CONNECTION_URL=postgresql://tickets:pass@localhost/tickets
+      POSTGRES_DB: tickets
+      POSTGRES_USER: tickets
+      POSTGRES_PASSWORD: pass
