@@ -4,9 +4,12 @@ const {
 	ModalBuilder,
 	TextInputBuilder,
 	TextInputStyle,
+	MessageFlags,
 } = require('discord.js');
 const ExtendedEmbedBuilder = require('../../lib/embed');
-const { quick } = require('../../lib/threads');
+const { pools } = require('../../lib/threads');
+
+const { crypto } = pools;
 
 module.exports = class TopicSlashCommand extends SlashCommand {
 	constructor(client, options) {
@@ -51,7 +54,7 @@ module.exports = class TopicSlashCommand extends SlashCommand {
 						.setTitle(getMessage('misc.not_ticket.title'))
 						.setDescription(getMessage('misc.not_ticket.description')),
 				],
-				flags: 'Ephemeral',
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -61,13 +64,13 @@ module.exports = class TopicSlashCommand extends SlashCommand {
 			.setCustomId('topic')
 			.setLabel(getMessage('modals.topic.label'))
 			.setStyle(TextInputStyle.Paragraph)
-			.setMaxLength(1000)
+			.setMaxLength(100)
 			.setMinLength(5)
 			.setPlaceholder(getMessage('modals.topic.placeholder'))
 			.setRequired(true);
 
 		// why can't discord.js accept null or undefined :(
-		if (ticket.topic) field.setValue(await quick('crypto', w => w.decrypt(ticket.topic)));
+		if (ticket.topic) field.setValue(await crypto.queue(w => w.decrypt(ticket.topic)));
 
 		await interaction.showModal(
 			new ModalBuilder()

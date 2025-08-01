@@ -11,6 +11,7 @@ const {
 	StringSelectMenuOptionBuilder,
 	TextInputBuilder,
 	TextInputStyle,
+	MessageFlags,
 } = require('discord.js');
 const emoji = require('node-emoji');
 const ms = require('ms');
@@ -21,11 +22,12 @@ const { Collection } = require('discord.js');
 const spacetime = require('spacetime');
 
 const { getSUID } = require('../logging');
-const { getAverageTimes } = require('../stats');
 const {
-	quick,
-	reusable,
-} = require('../threads');
+	getAverageTimes, getAverageRating,
+} = require('../stats');
+const { pools } = require('../threads');
+
+const { crypto } = pools;
 
 /**
  * @typedef {import('@prisma/client').Category &
@@ -180,7 +182,7 @@ module.exports = class TicketManager {
 						.setTitle(getMessage('misc.unknown_category.title'))
 						.setDescription(getMessage('misc.unknown_category.description')),
 				],
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -202,7 +204,7 @@ module.exports = class TicketManager {
 						.setTitle(getMessage('misc.ratelimited.title'))
 						.setDescription(getMessage('misc.ratelimited.description')),
 				],
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		} else {
 			this.client.keyv.set(rlKey, true, ms('5s'));
@@ -218,12 +220,17 @@ module.exports = class TicketManager {
 					.setTitle(getMessage(`misc.${name}.title`))
 					.setDescription(getMessage(`misc.${name}.description`)),
 			],
-			ephemeral: true,
+			flags: MessageFlags.Ephemeral,
 		});
 
 		if (category.guild.blocklist.length !== 0) {
 			const blocked = category.guild.blocklist.some(r => member.roles.cache.has(r));
 			if (blocked) return await sendError('blocked');
+		}
+
+		// Don't let timed out users open tickets, they won't be able to write anything inside
+		if (member.isCommunicationDisabled()) {
+			return await sendError('blocked');
 		}
 
 		if (category.requiredRoles.length !== 0) {
@@ -249,7 +256,7 @@ module.exports = class TicketManager {
 						.setTitle(getMessage('misc.member_limit.title', memberCount, memberCount))
 						.setDescription(getMessage('misc.member_limit.description', memberCount)),
 				],
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -265,7 +272,7 @@ module.exports = class TicketManager {
 						.setTitle(getMessage('misc.cooldown.title'))
 						.setDescription(getMessage('misc.cooldown.description', { time: ms(cooldown - Date.now()) })),
 				],
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -364,29 +371,24 @@ module.exports = class TicketManager {
 		action, categoryId, interaction, topic, referencesMessageId, referencesTicketId,
 	}) {
 		const [, category] = await Promise.all([
-			interaction.deferReply({ ephemeral: true }),
+			interaction.deferReply({ flags: MessageFlags.Ephemeral }),
 			this.getCategory(categoryId),
 		]);
 
 		let answers;
 		if (interaction.isModalSubmit()) {
 			if (action === 'questions') {
-				const worker = await reusable('crypto');
-				try {
-					answers = await Promise.all(
-						category.questions
-							.filter(q => q.type === 'TEXT')
-							.map(async q => ({
-								questionId: q.id,
-								userId: interaction.user.id,
-								value: interaction.fields.getTextInputValue(q.id)
-									? await worker.encrypt(interaction.fields.getTextInputValue(q.id))
-									: '', // TODO: maybe this should be null?
-							})),
-					);
-				} finally {
-					await worker.terminate();
-				}
+				answers = await Promise.all(
+					category.questions
+						.filter(q => q.type === 'TEXT')
+						.map(async q => ({
+							questionId: q.id,
+							userId: interaction.user.id,
+							value: interaction.fields.getTextInputValue(q.id)
+								? await crypto.queue(w => w.encrypt(interaction.fields.getTextInputValue(q.id)))
+								: '', // TODO: maybe this should be null?
+						})),
+				);
 				if (category.customTopic) topic = interaction.fields.getTextInputValue(category.customTopic);
 			} else if (action === 'topic') {
 				topic = interaction.fields.getTextInputValue('topic');
@@ -430,7 +432,7 @@ module.exports = class TicketManager {
 			topic: `${creator}${topic?.length > 0 ? ` | ${topic}` : ''}`,
 		});
 
-		const needsStats = /{+\s?(avgResponseTime|avgResolutionTime)\s?}+/i.test(category.openingMessage);
+		const needsStats = /{+\s?(avgResponseTime|avgResolutionTime|avgRating)\s?}+/i.test(category.openingMessage);
 		const statsCacheKey = `cache/category-stats/${categoryId}`;
 		let stats = await this.client.keyv.get(statsCacheKey);
 		if (needsStats && !stats) {
@@ -438,6 +440,7 @@ module.exports = class TicketManager {
 				select: {
 					closedAt: true,
 					createdAt: true,
+					feedback: { select: { rating: true } },
 					firstResponseAt: true,
 				},
 				where: {
@@ -450,7 +453,9 @@ module.exports = class TicketManager {
 				avgResolutionTime,
 				avgResponseTime,
 			} = await getAverageTimes(closedTickets);
+			const avgRating = await getAverageRating(closedTickets);
 			stats = {
+				avgRating: avgRating.toFixed(1),
 				avgResolutionTime: ms(avgResolutionTime, { long: true }),
 				avgResponseTime: ms(avgResponseTime, { long: true }),
 			};
@@ -469,7 +474,8 @@ module.exports = class TicketManager {
 						.replace(/{+\s?(user)?name\s?}+/gi, creator.user.toString())
 						.replace(/{+\s?num(ber)?\s?}+/gi, number)
 						.replace(/{+\s?avgResponseTime\s?}+/gi, stats?.avgResponseTime)
-						.replace(/{+\s?avgResolutionTime\s?}+/gi, stats?.avgResolutionTime),
+						.replace(/{+\s?avgResolutionTime\s?}+/gi, stats?.avgResolutionTime)
+						.replace(/{+\s?avgRating\s?}+/gi, stats?.avgRating),
 				),
 		];
 
@@ -632,7 +638,7 @@ module.exports = class TicketManager {
 					embed.addFields({
 						inline: false,
 						name: getMessage('ticket.references_ticket.fields.topic'),
-						value: await quick('crypto', worker => worker.decrypt(ticket.topic)),
+						value: await crypto.queue(w => w.decrypt(ticket.topic)),
 					});
 				}
 				channel.send({
@@ -669,7 +675,7 @@ module.exports = class TicketManager {
 			id: channel.id,
 			number,
 			openingMessageId: sent.id,
-			topic: topic ? await quick('crypto', worker => worker.encrypt(topic)) : null,
+			topic: topic ? await crypto.queue(w => w.encrypt(topic)) : null,
 		};
 		if (referencesTicketId) data.referencesTicket = { connect: { id: referencesTicketId } };
 		if (answers) data.questionAnswers = { createMany: { data: answers } };
@@ -785,6 +791,7 @@ module.exports = class TicketManager {
 			if (working && process.env.PUBLIC_BOT !== 'true') {
 				let online = 0;
 				for (const [, member] of channel.members) {
+					if (member.user.bot) continue;
 					if (!await isStaff(channel.guild, member.id)) continue;
 					if (member.presence && member.presence !== 'offline') online++;
 				}
@@ -830,11 +837,11 @@ module.exports = class TicketManager {
 						.setTitle(getMessage('commands.slash.claim.not_staff.title'))
 						.setDescription(getMessage('commands.slash.claim.not_staff.description')),
 				],
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
-		await interaction.deferReply({ ephemeral: false });
+		await interaction.deferReply();
 
 		await Promise.all([
 			interaction.channel.permissionOverwrites.edit(interaction.user, { 'ViewChannel': true }, `Ticket claimed by ${interaction.user.tag}`),
@@ -933,11 +940,11 @@ module.exports = class TicketManager {
 						.setTitle(getMessage('commands.slash.claim.not_staff.title'))
 						.setDescription(getMessage('commands.slash.claim.not_staff.description')),
 				],
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
-		await interaction.deferReply({ ephemeral: false });
+		await interaction.deferReply();
 
 		await Promise.all([
 			interaction.channel.permissionOverwrites.delete(interaction.user, `Ticket released by ${interaction.user.tag}`),
@@ -1045,7 +1052,7 @@ module.exports = class TicketManager {
 	async beforeRequestClose(interaction) {
 		const ticket = await this.getTicket(interaction.channel.id);
 		if (!ticket) {
-			await interaction.deferReply({ ephemeral: true });
+			await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 			const {
 				errorColour,
 				footer,
@@ -1216,11 +1223,8 @@ module.exports = class TicketManager {
 		closedBy = null,
 		reason = null,
 	}) {
-		if (this.$stale.has(ticketId)) this.$stale.delete(ticketId);
 		let ticket = await this.getTicket(ticketId);
 		const getMessage = this.client.i18n.getLocale(ticket.guild.locale);
-		this.$count.categories[ticket.categoryId].total -= 1;
-		this.$count.categories[ticket.categoryId][ticket.createdById] -= 1;
 
 		const { _count: { archivedMessages } } = await this.client.prisma.ticket.findUnique({
 			select: { _count: { select: { archivedMessages: true } } },
@@ -1236,7 +1240,7 @@ module.exports = class TicketManager {
 					where: { id: closedBy },
 				},
 			} || undefined, // Prisma wants undefined not null because it is a relation
-			closedReason: reason && await quick('crypto', worker => worker.encrypt(reason)),
+			closedReason: reason && await crypto.queue(w => w.encrypt(reason)),
 			messageCount: archivedMessages,
 			open: false,
 		};
@@ -1248,15 +1252,26 @@ module.exports = class TicketManager {
 			data.pinnedMessageIds = [...pinned.keys()];
 		}
 
-		ticket = await this.client.prisma.ticket.update({
-			data,
-			include: {
-				category: true,
-				feedback: true,
-				guild: true,
-			},
-			where: { id: ticket.id },
-		});
+		try {
+			ticket = await this.client.prisma.ticket.update({
+				data,
+				include: {
+					category: true,
+					feedback: true,
+					guild: true,
+				},
+				where: { id: ticket.id },
+			});
+			if (this.$stale.has(ticketId)) this.$stale.delete(ticketId);
+			this.$count.categories[ticket.categoryId] ??= {};
+			this.$count.categories[ticket.categoryId].total -= 1;
+			this.$count.categories[ticket.categoryId][ticket.createdById] -= 1;
+		} catch (error) {
+			this.client.log.error(error);
+			return;
+		}
+
+		const guild = this.client.guilds.cache.get(ticket.guildId);
 
 		if (channel?.deletable) {
 			const member = closedBy ? channel.guild.members.cache.get(closedBy) : null;
@@ -1324,12 +1339,12 @@ module.exports = class TicketManager {
 			topic: ticket.topic && {
 				inline: true,
 				name: getMessage('dm.closed.fields.topic'),
-				value: await quick('crypto', worker => worker.decrypt(ticket.topic)),
+				value: await crypto.queue(w => w.decrypt(ticket.topic)),
 			},
 		};
 
 		const dmEmbed = new ExtendedEmbedBuilder({
-			iconURL: channel.guild.iconURL(),
+			iconURL: guild.iconURL(),
 			text: ticket.guild.footer,
 		})
 			.setColor(ticket.guild.primaryColour)
@@ -1344,7 +1359,7 @@ module.exports = class TicketManager {
 		if (reason) dmEmbed.addFields(fields.reason);
 
 		try {
-			const creator = channel?.guild.members.cache.get(ticket.createdById);
+			const creator = guild.members.cache.get(ticket.createdById);
 			if (creator) {
 				await creator.send({
 					components,
@@ -1369,7 +1384,7 @@ module.exports = class TicketManager {
 				{
 					inline: true,
 					name: getMessage('modals.feedback.comment.label'),
-					value: (ticket.feedback.comment && await quick('crypto', worker => worker.decrypt(ticket.feedback.comment))) || getMessage('ticket.answers.no_value'),
+					value: (ticket.feedback.comment && await crypto.queue(w => w.decrypt(ticket.feedback.comment))) || getMessage('ticket.answers.no_value'),
 				});
 		}
 		if (reason) fieldsArray.push(fields.reason);
@@ -1383,7 +1398,6 @@ module.exports = class TicketManager {
 			target: {
 				id: ticket.id,
 				name: `${ticket.category.name} **#${ticket.number}**`,
-				reason,
 			},
 			userId: closedBy || this.client.user.id,
 		});

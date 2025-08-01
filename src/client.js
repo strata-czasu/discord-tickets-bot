@@ -36,6 +36,7 @@ module.exports = class Client extends FrameworkClient {
 					Partials.Reaction,
 				],
 				shards: 'auto',
+				waitGuildTimeout: ms('1h'),
 			},
 			{ baseDir: __dirname },
 		);
@@ -139,6 +140,7 @@ module.exports = class Client extends FrameworkClient {
 			this.log.debug(await this.prisma.$queryRaw`PRAGMA synchronous=normal;`); // https://www.sqlite.org/pragma.html#pragma_synchronous
 
 			setInterval(async () => {
+				this.log.info.cron('Optimising SQLite database');
 				this.log.debug(await this.prisma.$queryRaw`PRAGMA optimize;`); // https://www.sqlite.org/pragma.html#pragma_optimize
 			}, ms('6h'));
 		}

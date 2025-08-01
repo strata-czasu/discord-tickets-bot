@@ -2,13 +2,16 @@ const { SlashCommand } = require('@eartharoid/dbf');
 const {
 	ApplicationCommandOptionType,
 	PermissionsBitField,
+	MessageFlags,
 } = require('discord.js');
 const fs = require('fs');
 const { join } = require('path');
 const Mustache = require('mustache');
 const { AttachmentBuilder } = require('discord.js');
 const ExtendedEmbedBuilder = require('../../lib/embed');
-const { quick } = require('../../lib/threads');
+const { pools } = require('../../lib/threads');
+
+const { transcript: pool } = pools;
 
 module.exports = class TranscriptSlashCommand extends SlashCommand {
 	constructor(client, options) {
@@ -63,9 +66,7 @@ module.exports = class TranscriptSlashCommand extends SlashCommand {
 		/** @type {import("client")} */
 		const client = this.client;
 
-		// TODO: use a pool of multiple threads
-		// this is still slow for lots of messages
-		ticket = await quick('transcript', w => w(ticket));
+		ticket = await pool.queue(w => w(ticket));
 
 		const channelName = ticket.category.channelName
 			.replace(/{+\s?(user)?name\s?}+/gi, ticket.createdBy?.username)
@@ -113,7 +114,7 @@ module.exports = class TranscriptSlashCommand extends SlashCommand {
 		/** @type {import("client")} */
 		const client = this.client;
 
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 		ticketId = ticketId || interaction.options.getString('ticket', true);
 		const ticket = await client.prisma.ticket.findUnique({
 			include: {

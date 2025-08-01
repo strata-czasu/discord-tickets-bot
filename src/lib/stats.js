@@ -3,11 +3,15 @@
 const { version } = require('../../package.json');
 const { md5 } = require('./misc');
 const {
-	quick,
-	relativePool,
+	pools,
+	quickPool,
 } = require('./threads');
 
-const getAverageTimes = closedTickets => quick('stats', async w => ({
+const { stats } = pools;
+
+const getAverageRating = closedTickets => stats.queue(async w => await w.getAvgRating(closedTickets));
+
+const getAverageTimes = closedTickets => stats.queue(async w => ({
 	avgResolutionTime: await w.getAvgResolutionTime(closedTickets),
 	avgResponseTime: await w.getAvgResponseTime(closedTickets),
 }));
@@ -17,6 +21,7 @@ const getAverageTimes = closedTickets => quick('stats', async w => ({
  * @param {import("../client")} client
  */
 async function sendToHouston(client) {
+	client.log.info.cron('Preparing Houston report');
 	const guilds = await client.prisma.guild.findMany({
 		include: {
 			categories: { include: { _count: { select: { questions: true } } } },
@@ -39,7 +44,8 @@ async function sendToHouston(client) {
 		activated_users: users._count,
 		arch: process.arch,
 		database: process.env.DB_PROVIDER,
-		guilds: await relativePool(.25, 'stats', pool => Promise.all(
+		// this gets a dedicated pool so it doesn't block other stats uses
+		guilds: await quickPool(.25, 'stats', pool => Promise.all(
 			guilds
 				.filter(guild => client.guilds.cache.has(guild.id))
 				.map(guild => {
@@ -81,6 +87,7 @@ async function sendToHouston(client) {
 };
 
 module.exports = {
+	getAverageRating,
 	getAverageTimes,
 	sendToHouston,
 };

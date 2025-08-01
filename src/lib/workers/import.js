@@ -1,6 +1,5 @@
 const { expose } = require('threads/worker');
-const Cryptr = require('cryptr');
-const { encrypt } = new Cryptr(process.env.ENCRYPTION_KEY);
+const { encrypt } = require('../crypto');
 
 expose({
 	importTicket(stringified, guildId, categoryMap) {
@@ -83,6 +82,7 @@ expose({
 				};
 				delete ticket.feedback.userId;
 			}
+			delete ticket.feedback.ticketId;
 			ticket.feedback = { create: ticket.feedback };
 		} else {
 			ticket.feedback = undefined;

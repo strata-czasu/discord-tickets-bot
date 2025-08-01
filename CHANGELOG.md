@@ -1,3 +1,217 @@
+## [4.0.47](https://github.com/discord-tickets/bot/compare/v4.0.46...v4.0.47) (2025-07-27)
+
+
+### Bug Fixes
+
+* staff offline message sending when it shouldn't (fixes [#645](https://github.com/discord-tickets/bot/issues/645)) ([23834f5](https://github.com/discord-tickets/bot/commit/23834f5f5f9eee6a1c93dc8d651eb2ce5f9f7ae6))
+
+
+
+## [4.0.46](https://github.com/discord-tickets/bot/compare/v4.0.45...v4.0.46) (2025-07-25)
+
+
+### Bug Fixes
+
+* staff offline message not displaying (fixes [#641](https://github.com/discord-tickets/bot/issues/641)) ([#642](https://github.com/discord-tickets/bot/issues/642)) ([cb22a92](https://github.com/discord-tickets/bot/commit/cb22a9271c8e31da29de7237cf1b64158ad1eb74))
+
+
+### Reverts
+
+* Revert "fix: enable stale handling when public" ([416201b](https://github.com/discord-tickets/bot/commit/416201b72426eeabecb4b7aec77e285f148e3c0f))
+
+
+
+## [4.0.45](https://github.com/discord-tickets/bot/compare/v4.0.44...v4.0.45) (2025-07-24)
+
+
+### Bug Fixes
+
+* enable stale handling when public ([48fa871](https://github.com/discord-tickets/bot/commit/48fa8713a8c39d9825dbca7702d640dee048f03e))
+* **i18n:** Danish translations ([ed02f8b](https://github.com/discord-tickets/bot/commit/ed02f8baa4d146cdac2a836a5389457db9b91cd7))
+* log when sentry is enabled ([1809815](https://github.com/discord-tickets/bot/commit/1809815de88dd26287185765ff9dffa7d51bc3c7))
+
+
+### Features
+
+* `CPU_LIMIT` env ([271efd9](https://github.com/discord-tickets/bot/commit/271efd933b92b9e4cb7b37029a98d6df1fa25c7e))
+* add avgRating to default config ([08516d1](https://github.com/discord-tickets/bot/commit/08516d1bab6d6af5b21752d01e5738cab93ed239))
+* average rating stat ([651251d](https://github.com/discord-tickets/bot/commit/651251de37ecc5d70d55b840424c318703bbc1e1))
+* **i18n:** update Danish translations ([3068ae8](https://github.com/discord-tickets/bot/commit/3068ae8a37a247693d42175d55d4163ae2a4b3f3))
+* **i18n:** update Danish translations ([526518f](https://github.com/discord-tickets/bot/commit/526518fc147517b98d814ad9ecb0c76c9bd9a8f5))
+* **i18n:** update German translations ([b950c81](https://github.com/discord-tickets/bot/commit/b950c81eee4a950459a5792354dcd99e65b2ce6b))
+* **i18n:** update Russian translations ([ffa7d08](https://github.com/discord-tickets/bot/commit/ffa7d083bcdaba4cc3a11159ddb829e157c622d7))
+
+
+### Performance Improvements
+
+* export handling and add sentry ([#638](https://github.com/discord-tickets/bot/issues/638)) ([50a9ea6](https://github.com/discord-tickets/bot/commit/50a9ea61a982b2bf52123215e89cb954884d3f84))
+
+
+
+## [4.0.44](https://github.com/discord-tickets/bot/compare/v4.0.43...v4.0.44) (2025-07-04)
+
+
+### Bug Fixes
+
+* `/tickets` command ([220ca64](https://github.com/discord-tickets/bot/commit/220ca647354ace01ac25da3d89fecce668178d13))
+* accidently left timer at 15s instead of 15m 🤦‍♂️ ([1220d72](https://github.com/discord-tickets/bot/commit/1220d728c18f243a4b00d65e59097b597540bcd3))
+
+
+
+## [4.0.43](https://github.com/discord-tickets/bot/compare/v4.0.42...v4.0.43) (2025-07-02)
+
+
+### Bug Fixes
+
+* disable stale ticket handling on public bots ([a5d4098](https://github.com/discord-tickets/bot/commit/a5d409860c27fd0da7305fe8a4672d62cf89725b))
+
+
+### Features
+
+* **i18n:** update Thai translations ([b363f36](https://github.com/discord-tickets/bot/commit/b363f365052474d28dbd8584a42f591c1503a169))
+
+
+
+## [4.0.42](https://github.com/discord-tickets/bot/compare/v4.0.41...v4.0.42) (2025-07-01)
+
+
+### Performance Improvements
+
+* shared thread pools ([270a641](https://github.com/discord-tickets/bot/commit/270a641c07430344c223a125e67705e1a8ced549))
+
+
+
+## [4.0.41](https://github.com/discord-tickets/bot/compare/v4.0.40...v4.0.41) (2025-06-30)
+
+
+### Bug Fixes
+
+* error handling ([1906a94](https://github.com/discord-tickets/bot/commit/1906a94d0add8cf1e252fd92b035e96d6e6e0ba8))
+* stale tickets with no messages, auto close timestamp, loop perf ([365163c](https://github.com/discord-tickets/bot/commit/365163ca32eeaf01eb316e6c5330b7294a1ce88d))
+
+
+### Features
+
+* `DISABLE_ENCRYPTION` option ([#622](https://github.com/discord-tickets/bot/issues/622)) ([91323fc](https://github.com/discord-tickets/bot/commit/91323fc3b0aee8cb76d9a548ee4e650215477b5c))
+* **i18n:** add Ukrainian translations ([#618](https://github.com/discord-tickets/bot/issues/618)) ([809f733](https://github.com/discord-tickets/bot/commit/809f733a98b1f70751481551ed706d436560f8d7))
+* **i18n:** update Russian translations ([56373c4](https://github.com/discord-tickets/bot/commit/56373c427a67f4bc3245bee4079b1f3fcaf93c03))
+* **i18n:** update Ukrainian translations ([2eb8cf0](https://github.com/discord-tickets/bot/commit/2eb8cf0588a622489b7c2bf452872abd2ad0ee68))
+* log on interval ([3daccc7](https://github.com/discord-tickets/bot/commit/3daccc7ae8e802e9ef4bdfa8d2fdaef461644d3d))
+
+
+
+## [4.0.40](https://github.com/discord-tickets/bot/compare/v4.0.39...v4.0.40) (2025-05-23)
+
+
+### Bug Fixes
+
+* 1h guild timeout ([51a6c1a](https://github.com/discord-tickets/bot/commit/51a6c1a73e70aceed59afe47f2f8157a228f3961))
+
+
+
+## [4.0.39](https://github.com/discord-tickets/bot/compare/v4.0.38...v4.0.39) (2025-05-23)
+
+
+### Bug Fixes
+
+* triple guild timeout ([8150084](https://github.com/discord-tickets/bot/commit/8150084fed3abc9a02edc15a352b5ec0fef51171))
+
+
+### Features
+
+* block timed out users ([#612](https://github.com/discord-tickets/bot/issues/612)) ([6e51345](https://github.com/discord-tickets/bot/commit/6e51345e40bd8d27e2822387e4e08f7cc231f1d1))
+* **i18n:** add Japanese translations ([c20c509](https://github.com/discord-tickets/bot/commit/c20c509e867cab14549086f3afa2dff0c99bd586))
+* **i18n:** update Japanese translations ([088b980](https://github.com/discord-tickets/bot/commit/088b980192dc8b22888c62e4ce334a8b006d49eb))
+* **i18n:** update Russian translations ([41c20d6](https://github.com/discord-tickets/bot/commit/41c20d600ed333b83275c5968b5fdf46de64fd13))
+* **panels:** optional title ([f1a8530](https://github.com/discord-tickets/bot/commit/f1a85308c48fa8cded715c9eaa931579c4beee03))
+
+
+
+## [4.0.38](https://github.com/discord-tickets/bot/compare/v4.0.37...v4.0.38) (2025-03-31)
+
+
+### Bug Fixes
+
+* **docker:** pre-create runtime directories ([#607](https://github.com/discord-tickets/bot/issues/607)) ([6375f4c](https://github.com/discord-tickets/bot/commit/6375f4c53c3b6cfbb5689594cb28e68950862a2a))
+* increase timeout for missing guilds ([c94ee65](https://github.com/discord-tickets/bot/commit/c94ee655f6fe206a6e28fc5af03757f85d812782))
+
+
+
+## [4.0.37](https://github.com/discord-tickets/bot/compare/v4.0.36...v4.0.37) (2025-03-26)
+
+
+### Bug Fixes
+
+* importing with feedback ([86ea3cc](https://github.com/discord-tickets/bot/commit/86ea3cc7fe6def137b8c2dfc40969a6225411a97))
+
+
+### Features
+
+* **i18n:** add Vietnamese translations ([be0ddbc](https://github.com/discord-tickets/bot/commit/be0ddbc17d14e9c5ee0a3251f2993a233cd022ec))
+* **i18n:** update Vietnamese translations ([71094c1](https://github.com/discord-tickets/bot/commit/71094c1725549469bcc2c5738d54c40210b11939))
+* **i18n:** update Vietnamese translations ([#602](https://github.com/discord-tickets/bot/issues/602)) ([3c853ea](https://github.com/discord-tickets/bot/commit/3c853ea4d6e2662672d64e185af1706c8fd1c914))
+
+
+
+## [4.0.36](https://github.com/discord-tickets/bot/compare/v4.0.35...v4.0.36) (2025-03-18)
+
+
+### Bug Fixes
+
+* sync and close error handling ([c0bea3d](https://github.com/discord-tickets/bot/commit/c0bea3d32dfcbfa627a723ff8f8395a6e3aced31))
+
+
+### Features
+
+* **i18n:** update Czech translations ([205d1c2](https://github.com/discord-tickets/bot/commit/205d1c232971d82e73e7bc025a86e2ac6ae435a2))
+* **i18n:** update Czech translations ([074ba42](https://github.com/discord-tickets/bot/commit/074ba4266eea60aa783d76573df37558a52435bd))
+* **i18n:** update French translations ([42fefa9](https://github.com/discord-tickets/bot/commit/42fefa92d882179bb624fb7c27738e8480b41df5))
+* **i18n:** update German translations ([#595](https://github.com/discord-tickets/bot/issues/595)) ([e30c149](https://github.com/discord-tickets/bot/commit/e30c149bc149e97bfe774694ea6eeeea80ed4e3f))
+
+
+
+## [4.0.35](https://github.com/discord-tickets/bot/compare/v4.0.34...v4.0.35) (2025-03-06)
+
+
+### Bug Fixes
+
+* add `.zip` extension to export file name ([d8bd963](https://github.com/discord-tickets/bot/commit/d8bd9632000f003164ea970d6bfe84f7001a7fe2))
+* correct tag content max length ([cdbd065](https://github.com/discord-tickets/bot/commit/cdbd065b69f819ba1b1b7535414a96fd571fa71d))
+
+
+
+## [4.0.34](https://github.com/discord-tickets/bot/compare/v4.0.33...v4.0.34) (2025-03-05)
+
+
+### Bug Fixes
+
+* `send()` user create button if possible ([eaa970f](https://github.com/discord-tickets/bot/commit/eaa970fd010f044ead70a4d70d2dae9652d803af))
+* **api:** service keys ([07c4e9a](https://github.com/discord-tickets/bot/commit/07c4e9a5eec6df39cd230dfc7967466f9c5df3e2))
+* decrypt feedback comment in close log ([3273f90](https://github.com/discord-tickets/bot/commit/3273f90902fbdfc149aaa9d1d564df291753bbc4))
+* duplicate reason in close log ([2c05460](https://github.com/discord-tickets/bot/commit/2c05460684f8e587882d007dde258b9512886dda))
+* feedback comment in close log ([4b951ec](https://github.com/discord-tickets/bot/commit/4b951ec57862f9108e42c390f1ebc0d1f2296a7b))
+* feedback in close log ([1989706](https://github.com/discord-tickets/bot/commit/1989706d266eccdd82615fd66c19ae71b6d0fc98))
+* importing a ticket with question answers ([4fe0e68](https://github.com/discord-tickets/bot/commit/4fe0e682fdc34b29afed3321ae4fa3f7bb1b963d))
+* only allow referencing messages with `content` ([ec4a701](https://github.com/discord-tickets/bot/commit/ec4a701651d01f5bd458983459a9ff7c4d0f912c))
+* panel emoji error handling ([ec5179c](https://github.com/discord-tickets/bot/commit/ec5179cc4163704c43df5366e71b13029b66f9e0))
+* public bot warning condition ([f963203](https://github.com/discord-tickets/bot/commit/f96320399fcf752fc56b303c1b87d21bdb302751))
+* user/create command when there is a single category ([2b02edd](https://github.com/discord-tickets/bot/commit/2b02edd27b4f3b77b0bbce2bf7d2df44e03ad92f))
+
+
+### Features
+
+* allow anyone to use create button sent for a specific user ([6274f66](https://github.com/discord-tickets/bot/commit/6274f66d447f7c3a3bfb1ddf0a4a9effeb020897))
+* detailed ticket close log message ([27d17fb](https://github.com/discord-tickets/bot/commit/27d17fb4ce7450f1f6c93c0d92f580c3edba3139))
+* **i18n:** update French translations ([df0d3a7](https://github.com/discord-tickets/bot/commit/df0d3a7e12c02feb6cad363a687e821549733632))
+* **i18n:** update German translations ([d4ea64c](https://github.com/discord-tickets/bot/commit/d4ea64c0d5a3d9ef11f326134e8fa7a82e975493))
+* **i18n:** update German translations ([83a77bc](https://github.com/discord-tickets/bot/commit/83a77bcf54ae14e643a806890898c104ccf442a5))
+* **i18n:** update German translations ([72120e9](https://github.com/discord-tickets/bot/commit/72120e902597b52077347ed1995af7ba896a96af))
+* **i18n:** update translation files ([5d43806](https://github.com/discord-tickets/bot/commit/5d4380698f99f169d57a6ddbe0bd1df3aefd97ea))
+* inline log when editing question answers ([cb30171](https://github.com/discord-tickets/bot/commit/cb30171ee71c7ef6f58861e04aefe80d4a6ca32e))
+* shorter max topic length (100) ([96775df](https://github.com/discord-tickets/bot/commit/96775dfabcc36407f4d30631f3013390cf0107c2))
+
+
+
 ## [4.0.33](https://github.com/discord-tickets/bot/compare/v4.0.32...v4.0.33) (2025-02-18)
 
 

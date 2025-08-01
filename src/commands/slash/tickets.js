@@ -2,10 +2,13 @@ const { SlashCommand } = require('@eartharoid/dbf');
 const {
 	ApplicationCommandOptionType,
 	PermissionsBitField,
+	MessageFlags,
 } = require('discord.js');
 const { isStaff } = require('../../lib/users');
 const ExtendedEmbedBuilder = require('../../lib/embed');
-const { reusable } = require('../../lib/threads');
+const { pools } = require('../../lib/threads');
+
+const { crypto } = pools;
 
 module.exports = class TicketsSlashCommand extends SlashCommand {
 	constructor(client, options) {
@@ -39,7 +42,7 @@ module.exports = class TicketsSlashCommand extends SlashCommand {
 		/** @type {import("client")} */
 		const client = this.client;
 
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 		await client.application.commands.fetch();
 
 		const member = interaction.options.getMember('member', false) ?? interaction.member;
@@ -115,45 +118,41 @@ module.exports = class TicketsSlashCommand extends SlashCommand {
 			},
 		});
 
-		const worker = await reusable('crypto');
-		try {
-			if (open.length >= 1) {
-				fields.push({
-					name: getMessage('commands.slash.tickets.response.fields.open.name'),
-					value: (await Promise.all(
-						open.map(async ticket => {
-							const getTopic = async () => (await worker.decrypt(ticket.topic)).replace(/\n/g, ' ').substring(0, 30);
-							const topic = ticket.topic ? `- \`${await getTopic()}\`` : '';
-							return `> <#${ticket.id}> ${topic}`;
-						}),
-					)).join('\n'),
-				});
-			}
+		const getTopic = async ticket => (await crypto.queue(w => w.decrypt(ticket.topic))).replace(/\n/g, ' ').substring(0, 30);
 
-			if (closed.length === 0) {
-				const newCommand = client.application.commands.cache.find(c => c.name === 'new');
-				fields.push({
-					name: getMessage('commands.slash.tickets.response.fields.closed.name'),
-					value: getMessage(`commands.slash.tickets.response.fields.closed.none.${ownOrOther}`, {
-						new: `</${newCommand.name}:${newCommand.id}>`,
-						user: member.user.toString(),
+		if (open.length >= 1) {
+			fields.push({
+				name: getMessage('commands.slash.tickets.response.fields.open.name'),
+				value: (await Promise.all(
+					open.map(async ticket => {
+						const topic = ticket.topic ? `- \`${await getTopic(ticket)}\`` : '';
+						return `> <#${ticket.id}> ${topic}`;
 					}),
-				});
-			} else {
-				fields.push({
-					name: getMessage('commands.slash.tickets.response.fields.closed.name'),
-					value: (await Promise.all(
-						closed.map(async ticket => {
-							const getTopic = async () => (await worker.decrypt(ticket.topic)).replace(/\n/g, ' ').substring(0, 30);
-							const topic = ticket.topic ? `- \`${await getTopic()}\`` : '';
-							return `> ${ticket.category.name} #${ticket.number} (\`${ticket.id}\`) ${topic}`;
-						}),
-					)).join('\n'),
-				});
-			}
-		} finally {
-			await worker.terminate();
+				)).join('\n'),
+			});
 		}
+
+		if (closed.length === 0) {
+			const newCommand = client.application.commands.cache.find(c => c.name === 'new');
+			fields.push({
+				name: getMessage('commands.slash.tickets.response.fields.closed.name'),
+				value: getMessage(`commands.slash.tickets.response.fields.closed.none.${ownOrOther}`, {
+					new: `</${newCommand.name}:${newCommand.id}>`,
+					user: member.user.toString(),
+				}),
+			});
+		} else {
+			fields.push({
+				name: getMessage('commands.slash.tickets.response.fields.closed.name'),
+				value: (await Promise.all(
+					closed.map(async ticket => {
+						const topic = ticket.topic ? `- \`${await getTopic(ticket)}\`` : '';
+						return `> ${ticket.category.name} #${ticket.number} (\`${ticket.id}\`) ${topic}`;
+					}),
+				)).join('\n'),
+			});
+		}
+
 		// TODO: add portal URL to view all (this list is limited to the last 10)
 
 		const embed = new ExtendedEmbedBuilder({

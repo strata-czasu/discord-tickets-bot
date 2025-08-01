@@ -1,14 +1,15 @@
 # directories
 /.history/
-/.vscode/
 /node_modules/
 /prisma/
 /user/
+.idea/
 .direnv/
 
 # files
 *.env*
 *.db*
 *.log
+*.DS_Store
 summary.md
 .envrc.local

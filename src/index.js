@@ -80,6 +80,13 @@ process.on('uncaughtException', (error, origin) => {
 
 process.on('warning', warning => log.warn(warning.stack || warning));
 
+// INIT Sentry if required ENV vars are set
+const sentryEnabled = !!process.env.SENTRY_DSN;
+if(sentryEnabled) {
+	log.info('Enabling Sentry');
+	require('./sentry-init.js');
+}
+
 const Client = require('./client');
 const http = require('./http');
 
