@@ -4,9 +4,11 @@
 /node_modules/
 /prisma/
 /user/
+.direnv/
 
 # files
 *.env*
 *.db*
 *.log
 summary.md
+.envrc.local
