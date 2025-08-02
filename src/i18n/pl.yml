@@ -296,8 +296,8 @@ log:
     message: Wiadomość
     title: Wiadomość {verb}
     verb:
-      delete: usunięte
-      update: zaktualizowane
+      delete: usunięta
+      update: zaktualizowana
   ticket:
     added: Dodani członkowie
     removed: Usunięci członkowie
