@@ -303,9 +303,9 @@ log:
     removed: Usunięci członkowie
     ticket: Zgłoszenie
     title: Zgłoszenie {verb}
-    description: '{user}{verb} zgłoszenia'
+    description: 'Zgłoszenie {verb} przez {user}'
     verb:
-      unclaim: zwolniony
+      unclaim: zwolnione
       update: zaktualizowane
       create: utworzone
       claim: przejęte
