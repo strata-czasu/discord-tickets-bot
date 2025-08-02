@@ -290,7 +290,7 @@ log:
     verb:
       delete: usunięte
       update: zaktualizowane
-      create: Utworzony
+      create: utworzone
   message:
     description: '{user} {verb} wiadomość'
     message: Wiadomość
@@ -307,9 +307,9 @@ log:
     verb:
       unclaim: zwolniony
       update: zaktualizowane
-      create: Utworzony
+      create: utworzone
       claim: przejęte
-      close: Zamknięte
+      close: zamknięte
 misc:
   category_full:
     description: "Kategoria osiągnęła maksymalną pojemność.\nSpróbuj ponownie później.\n"
