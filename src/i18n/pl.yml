@@ -87,7 +87,7 @@ commands:
       confirm_multiple:
         description: "Zamierzasz zamknąć **{count}** zgłoszeń, które były nieaktywne
           przez ponad `{time}`:\n{tickets}\n"
-        title: ❓ Jesteś pewien?
+        title: ❓ Na pewno?
       confirmed_multiple:
         description: Kanały zostaną usunięte w ciągu kilku sekund.
         title:
@@ -197,7 +197,7 @@ commands:
             name: Zamknięte zgłoszenia
             none:
               other: '{user} nie posiada żadnych zgłoszeń.'
-              own: "Nie utworzyłeś żadnych zgłoszeń.\nUżyj {new}, aby otworzyć zgłoszenie.\n"
+              own: "Nie masz żadnych zgłoszeń.\nUżyj {new}, aby otworzyć zgłoszenie.\n"
         title:
           other: Zgłoszenia {displayName}
           own: Twoje zgłoszenia
@@ -321,7 +321,7 @@ misc:
   member_limit:
     title:
     - ❌ Posiadasz już zgłoszenie
-    - ❌Posiadasz już %d otwartych zgłoszeń
+    - ❌ Posiadasz już %d otwartych zgłoszeń
     description:
     - Użyj istniejącego zgłoszenia lub zamknij je przed utworzeniem kolejnego.
     - "Zamknij zgłoszenie przed utworzeniem kolejnego.\nUżyj `/tickets`, aby wyświetlić
@@ -333,14 +333,14 @@ misc:
     title: ❌ Zablokowany
     description: Nie masz uprawnień do tworzenia zgłoszeń.
   error:
-    description: "Przepraszam, wystąpił nieoczekiwany błąd.\nProszę przekazać te informacje
-      administratorowi.\n"
+    description: "Przepraszam, wystąpił nieoczekiwany błąd.\nPrzekaż proszę tę informację
+      administracji.\n"
     fields:
       identifier: Identyfikator
     title: ⚠️ Coś poszło nie tak
   expired:
     title: ⏰ Wygasł
-    description: Nie odpowiedziałeś na czas. Proszę spróbuj ponownie.
+    description: Brak odpowiedzi na czas. Proszę spróbuj ponownie.
   cooldown:
     description: Poczekaj {time} przed utworzeniem kolejnego zgłoszenia w tej kategorii.
     title: ❌Proszę czekać
@@ -373,16 +373,16 @@ modals:
     label: Temat
     placeholder: Czego dotyczy te zgłoszenie?
 ticket:
-  claimed: 🙌 {user} przejął to zgłoszenie.
+  claimed: 🙌 Zgłoszenie zostało przejęte przez {user}.
   close:
     closed:
       description: Ten kanał zostanie usunięty za kilka sekund…
       title: ✅ Zgłoszenie zamknięte
-    wait_for_staff: ✋ Poczekaj, aż personel zamknie to zgłoszenie.
+    wait_for_staff: ✋ Poczekaj, aż ktoś z administracji zamknie to zgłoszenie.
     forbidden:
       title: ❌ Błąd
       description: Nie masz uprawnień do zamknięcia tego zgłoszenia.
-    rejected: ✋ {user} odrzucił prośbę o zamknięcie tego zgłoszenia.
+    rejected: ✋ Prośba o zamknięcie zgłoszenia została odrzucona przez {user}.
     staff_request:
       title: ❓Czy te zgłoszenie można zamknąć?
       description: "{requestedBy} chce zamknąć to zgłoszenie.\nKliknij „Akceptuj”,
@@ -399,14 +399,14 @@ ticket:
     description: Twoje zmiany zostały zapisane.
     title: ✅ Zgłoszenie zaktualizowane
   offline:
-    description: W tej chwili nie ma już żadnych członków personelu, więc może ono
+    description: W tej chwili nie ma już żadnych członków administracji, więc może ono
       trwać dłużej niż zwykle.
     title: 😴 Nie jesteśmy online
   references_message:
     description: Odnośniki [wiadomość]({url}) wysłana {timestamp} przez {author}.
     title: ℹ️ Odnośnik
   references_ticket:
-    description: 'Te zgłoszenie jest powiązany z poprzednim zgłoszeniem:'
+    description: 'Te zgłoszenie jest powiązane z poprzednim zgłoszeniem:'
     fields:
       number: Numer
       date: Utworzono o godz
@@ -422,18 +422,18 @@ ticket:
     title: ⏰ Te zgłoszenie jest nieaktywne
   feedback: Dziękujemy za twoją opinię.
   opening_message:
-    content: "{staff}\n{creator} utworzył nowe zgłoszenie\n"
+    content: "{staff}\nNowe zgłoszenie od {creator}\n"
     fields:
       topic: Temat
-  released: ♻️ {user} zwolnił te zgłoszenie.
+  released: ♻️ Zgłoszenie zostało zwolnione przez {user}.
   working_hours:
     next:
-      title: 🕗 Chwilowo nie pracujemy
+      title: 🕗 Chwilowo nie jesteśmy dostępni
       description: Wrócimy o <t:{timestamp}:F> (<t:{timestamp}:R>), chociaż odpowiedź
         możesz otrzymać wcześniej.
     today:
       title: 🕗 Chwilowo nie pracujemy
-      description: Możesz otrzymać odpowiedź wcześniej, ale zaczynamy pracę dopiero
+      description: Możesz otrzymać odpowiedź wcześniej, ale wracamy dopiero
         <t:{timestamp}:t> dzisiaj (<t:{timestamp}:R>).
   answers:
     no_value: '*Brak odpowiedzi*'
