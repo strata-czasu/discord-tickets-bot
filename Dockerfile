@@ -5,7 +5,7 @@ FROM node:22-alpine3.20 AS builder
 # install required depencencies for node-gyp
 RUN apk add --no-cache make gcc g++ python3
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.18.3
 
 WORKDIR /build
 
