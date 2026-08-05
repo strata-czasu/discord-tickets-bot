@@ -122,7 +122,7 @@ commands:
           description: Kategoria, do której ma zostać przeniesione zgłoszenie
           name: kategoria
       description: Przenieś zgłoszenie do innej kategorii
-      moved: 🗃️ {by} przeniósł te zgłoszenie z **{from}** do **{to}**.
+      moved: 🗃️ {by} przeniósł to zgłoszenie z **{from}** do **{to}**.
     new:
       description: Utwórz nowe zgłoszenie
       options:
@@ -218,8 +218,8 @@ commands:
         member:
           name: członek
           description: Członek, na który ma zostać przeniesiona własność
-      transferred: 📨 {user} przekazał te zgłoszenie do {to}.
-      transferred_from: 📨 {user} przeniósł te zgłoszenie z {from} do {to}.
+      transferred: 📨 {user} przekazał to zgłoszenie do {to}.
+      transferred_from: 📨 {user} przeniósł to zgłoszenie z {from} do {to}.
       description: Transferuj własność zgłoszenia na innego członka
     topic:
       description: Zmień temat zgłoszenia
@@ -371,7 +371,7 @@ modals:
       placeholder: Czy masz jakieś dodatkowe uwagi?
   topic:
     label: Temat
-    placeholder: Czego dotyczy te zgłoszenie?
+    placeholder: Czego dotyczy to zgłoszenie?
 ticket:
   claimed: 🙌 Zgłoszenie zostało przejęte przez {user}.
   close:
@@ -384,7 +384,7 @@ ticket:
       description: Nie masz uprawnień do zamknięcia tego zgłoszenia.
     rejected: ✋ Prośba o zamknięcie zgłoszenia została odrzucona przez {user}.
     staff_request:
-      title: ❓Czy te zgłoszenie można zamknąć?
+      title: ❓Czy można zamknąć to zgłoszenie?
       description: "{requestedBy} chce zamknąć to zgłoszenie.\nKliknij „Akceptuj”,
         aby zamknąć teraz, lub „Odrzuć”, jeśli nadal potrzebujesz pomocy.\n"
       archived: "\nWiadomości na tym kanale zostaną zarchiwizowane do wykorzystania
@@ -406,7 +406,7 @@ ticket:
     description: Odnośniki [wiadomość]({url}) wysłana {timestamp} przez {author}.
     title: ℹ️ Odnośnik
   references_ticket:
-    description: 'Te zgłoszenie jest powiązane z poprzednim zgłoszeniem:'
+    description: 'To zgłoszenie jest powiązane z poprzednim zgłoszeniem:'
     fields:
       number: Numer
       date: Utworzono o godz
@@ -415,11 +415,11 @@ ticket:
   closing_soon:
     description: "To zgłoszenie zostanie zamknięte z powodu braku aktywności <t:{timestamp}:R>.\n
       Wyślij wiadomość, aby anulować tę automatyzację.\n"
-    title: ⌛ Te zgłoszenie zostanie wkrótce zamknięty
+    title: ⌛ To zgłoszenie zostanie wkrótce zamknięte
   inactive:
     description: "Nie było żadnej aktywności na tym kanale od <t:{timestamp}:R>.\n
       Kontynuuj rozmowę lub {close} zgłoszenie.\n"
-    title: ⏰ Te zgłoszenie jest nieaktywne
+    title: ⏰ To zgłoszenie jest nieaktywne
   feedback: Dziękujemy za twoją opinię.
   opening_message:
     content: "{staff}\nNowe zgłoszenie od {creator}\n"
