@@ -9,7 +9,7 @@ module.exports.get = fastify => ({
 			id: guild.id,
 			logo: iconURL(guild),
 			name: guild.name,
-			privilegeLevel: await getPrivilegeLevel(await guild.members.fetch(req.user.id)),
+			privilegeLevel: await getPrivilegeLevel(req.guildMember),
 		});
 	},
 	onRequest: [fastify.authenticate, fastify.isMember],

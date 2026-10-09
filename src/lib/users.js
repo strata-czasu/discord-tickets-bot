@@ -1,4 +1,22 @@
-const { PermissionsBitField } = require('discord.js');
+const {
+	Collection, PermissionsBitField,
+} = require('discord.js');
+
+/** Fetch current membership; only Unknown Member means the user has left. */
+const fetchMember = async (guild, userId) => {
+	try {
+		return await guild.members.fetch({
+			force: true,
+			user: userId,
+		});
+	} catch (error) {
+		if (error.code !== 10007) throw error;
+		guild.members.cache.delete(userId);
+		return null;
+	}
+};
+
+module.exports.fetchMember = fetchMember;
 
 /**
  *
@@ -6,7 +24,16 @@ const { PermissionsBitField } = require('discord.js');
  * @param {string} userId
  * @returns {Promise<Collection<import("discord.js").Guild>}
  */
-module.exports.getCommonGuilds = (client, userId) => client.guilds.cache.filter(guild => guild.members.cache.has(userId));
+module.exports.getCommonGuilds = async (client, userId) => {
+	const common = new Collection();
+	const guilds = [...client.guilds.cache.values()].filter(guild => guild.available);
+	for (let i = 0; i < guilds.length; i += 5) {
+		await Promise.all(guilds.slice(i, i + 5).map(async guild => {
+			if (await fetchMember(guild, userId)) common.set(guild.id, guild);
+		}));
+	}
+	return common;
+};
 
 /**
  * @param {import("discord.js").Guild} guild
@@ -37,12 +64,13 @@ module.exports.updateStaffRoles = updateStaffRoles;
  * @param {string} userId
  * @returns {Promise<boolean>}
  */
-module.exports.isStaff = async (guild, userId) => {
+const isStaff = async (guild, userId, member) => {
 	/** @type {import("client")} */
 	const client = guild.client;
 	if (client.supers.includes(userId)) return true;
 	try {
-		const guildMember = guild.members.cache.get(userId) || await guild.members.fetch(userId);
+		const guildMember = member || await fetchMember(guild, userId);
+		if (!guildMember) return false;
 		if (guildMember.permissions.has(PermissionsBitField.Flags.ManageGuild)) return true;
 		const staffRoles = await client.keyv.get(`cache/guild-staff:${guild.id}`) || await updateStaffRoles(guild);
 		return staffRoles.some(r => guildMember.roles.cache.has(r));
@@ -50,6 +78,8 @@ module.exports.isStaff = async (guild, userId) => {
 		return false;
 	}
 };
+
+module.exports.isStaff = isStaff;
 
 /**
  *
@@ -67,6 +97,6 @@ module.exports.getPrivilegeLevel = async member => {
 	else if (member.guild.client.supers.includes(member.id)) return 4;
 	else if (member.guild.ownerId === member.id) return 3;
 	else if (member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return 2;
-	else if (await this.isStaff(member.guild, member.id)) return 1;
+	else if (await isStaff(member.guild, member.id, member)) return 1;
 	else return 0;
 };

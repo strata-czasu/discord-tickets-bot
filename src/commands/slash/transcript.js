@@ -1,7 +1,6 @@
 const { SlashCommand } = require('@eartharoid/dbf');
 const {
 	ApplicationCommandOptionType,
-	PermissionsBitField,
 	MessageFlags,
 } = require('discord.js');
 const fs = require('fs');
@@ -9,6 +8,7 @@ const { join } = require('path');
 const Mustache = require('mustache');
 const { AttachmentBuilder } = require('discord.js');
 const ExtendedEmbedBuilder = require('../../lib/embed');
+const canAccessTicket = require('../../lib/tickets/access');
 const { pools } = require('../../lib/threads');
 
 const { transcript: pool } = pools;
@@ -51,15 +51,7 @@ module.exports = class TranscriptSlashCommand extends SlashCommand {
 	}
 
 	shouldAllowAccess(interaction, ticket) {
-		// the creator can always get their ticket, even from outside the guild
-		if (ticket.createdById === interaction.user.id) return true; // user not member (DMs)
-		// everyone else must be in the guild
-		if (interaction.guild?.id !== ticket.guildId) return false;
-		// and have authority
-		if (interaction.client.supers.includes(interaction.member.id)) return true;
-		if (interaction.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return true;
-		if (interaction.member.roles.cache.filter(role => ticket.category.staffRoles.includes(role.id)).size > 0) return true;
-		return false;
+		return canAccessTicket(interaction, ticket);
 	}
 
 	async fillTemplate(ticket) {
