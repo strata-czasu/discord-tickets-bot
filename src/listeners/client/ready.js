@@ -8,6 +8,7 @@ const {
 	sendToHouston,
 } = require('../../lib/stats');
 const handleStaleTickets = require('../../lib/stale');
+const handleDepartedTickets = require('../../lib/departed');
 
 module.exports = class extends Listener {
 	constructor(client, options) {
@@ -114,6 +115,10 @@ module.exports = class extends Listener {
 			checkForUpdates(client);
 			setInterval(() => checkForUpdates(client), ms('1w'));
 		}
+
+		const checkMembership = () => handleDepartedTickets(client).catch(client.log.error);
+		checkMembership();
+		setInterval(checkMembership, ms('15m'));
 
 		if (process.env.PUBLIC_BOT === 'true') {
 			client.log.notice('Inactivity warnings and auto-close features are disabled');

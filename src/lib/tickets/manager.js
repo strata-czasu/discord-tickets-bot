@@ -711,7 +711,6 @@ module.exports = class TicketManager {
 			const currentHours = workingHours[now.day()];
 			const start = now.time(currentHours[0]);
 			const end = now.time(currentHours[1]);
-			let working = true;
 
 			if (currentHours[0] === currentHours[1] || now.isAfter(end)) { // staff have the day off or have finished for the day
 				// first look for the next working day *this* week (after today)
@@ -719,7 +718,6 @@ module.exports = class TicketManager {
 				// if there isn't one, look for the next working day *next* week (before and including today's weekday)
 				if (!nextIndex) nextIndex = workingHours.findIndex((hours, i) => i <= now.day() && hours[0] !== hours[1]);
 				if (nextIndex) {
-					working = false;
 					const next = workingHours[nextIndex];
 					let then = now.add(nextIndex - now.day(), 'day');
 					if (nextIndex <= now.day()) then = then.add(1, 'week');
@@ -734,7 +732,6 @@ module.exports = class TicketManager {
 					}).catch(this.client.log.error);
 				}
 			} else if (now.isBefore(start)) { // staff haven't started working yet
-				working = false;
 				const timestamp = Math.ceil(start.goto('utc').d.getTime() / 1000); // in seconds
 				channel.send({
 					embeds: [
@@ -746,25 +743,6 @@ module.exports = class TicketManager {
 				}).catch(this.client.log.error);
 			}
 
-			if (working && process.env.PUBLIC_BOT !== 'true') {
-				let online = 0;
-				for (const [, member] of channel.members) {
-					if (member.user.bot) continue;
-					if (!await isStaff(channel.guild, member.id)) continue;
-					if (member.presence && member.presence !== 'offline') online++;
-				}
-				if (online === 0) {
-					channel.send({
-						embeds: [
-							new ExtendedEmbedBuilder()
-								.setColor(category.guild.primaryColour)
-								.setTitle(getMessage('ticket.offline.title'))
-								.setDescription(getMessage('ticket.offline.description')),
-						],
-					}).catch(this.client.log.error);
-					this.client.keyv.set(`offline/${channel.id}`, Date.now(), ms('1h'));
-				}
-			}
 		} catch (error) {
 			this.client.log.error(error);
 		}
