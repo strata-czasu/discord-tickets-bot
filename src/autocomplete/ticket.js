@@ -4,6 +4,7 @@ const emoji = require('node-emoji');
 const Keyv = require('keyv');
 const ms = require('ms');
 const { isStaff } = require('../lib/users');
+const canAccessTicket = require('../lib/tickets/access');
 const { pools } = require('../lib/threads');
 
 const { crypto } = pools;
@@ -31,7 +32,6 @@ module.exports = class TicketCompleter extends Autocompleter {
 		let tickets = await this.cache.get(cacheKey);
 
 		if (!tickets) {
-			const cmd = client.commands.commands.slash.get('transcript');
 			const { locale } = await client.prisma.guild.findUnique({
 				select: { locale: true },
 				where: { id: guildId },
@@ -47,7 +47,6 @@ module.exports = class TicketCompleter extends Autocompleter {
 
 			tickets = await Promise.all(
 				tickets
-					.filter(ticket => cmd.shouldAllowAccess(interaction, ticket))
 					.map(async ticket => {
 						const getTopic = async () => (await crypto.queue(w => w.decrypt(ticket.topic))).replace(/\n/g, ' ').substring(0, 50);
 						const date = new Date(ticket.createdAt).toLocaleString([locale, 'en-GB'], { dateStyle: 'short' });
@@ -61,7 +60,8 @@ module.exports = class TicketCompleter extends Autocompleter {
 			this.cache.set(cacheKey, tickets, ms('1m'));
 		}
 
-		const options = value ? tickets.filter(t => t._name.match(new RegExp(value, 'i'))) : tickets;
+		const accessible = tickets.filter(ticket => canAccessTicket(interaction, ticket));
+		const options = value ? accessible.filter(t => t._name.match(new RegExp(value, 'i'))) : accessible;
 		return options
 			.slice(0, 25)
 			.map(t => ({

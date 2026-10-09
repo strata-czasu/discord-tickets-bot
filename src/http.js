@@ -2,7 +2,9 @@ const fastify = require('fastify')({ trustProxy: process.env.HTTP_TRUST_PROXY ==
 const { short } = require('leeks.js');
 const { join } = require('path');
 const { files } = require('node-dir');
-const { getPrivilegeLevel } = require('./lib/users');
+const {
+	fetchMember, getPrivilegeLevel,
+} = require('./lib/users');
 const { format } = require('util');
 
 process.env.ORIGIN = process.env.HTTP_INTERNAL || process.env.HTTP_EXTERNAL;
@@ -44,6 +46,7 @@ module.exports = async client => {
 		}
 	});
 
+	fastify.decorateRequest('guildMember', null);
 	fastify.decorate('isMember', async (req, res) => {
 		try {
 			const userId = req.user.id;
@@ -57,7 +60,7 @@ module.exports = async client => {
 
 				});
 			}
-			const guildMember = await guild.members.fetch(userId);
+			const guildMember = await fetchMember(guild, userId);
 			if (!guildMember) {
 				return res.code(403).send({
 					error: 'Forbidden',
@@ -66,8 +69,14 @@ module.exports = async client => {
 
 				});
 			}
+			req.guildMember = guildMember;
 		} catch (err) {
-			res.send(err);
+			client.log.error(err);
+			return res.code(503).send({
+				error: 'Service Unavailable',
+				message: 'Unable to verify membership.',
+				statusCode: 503,
+			});
 		}
 	});
 
@@ -99,7 +108,7 @@ module.exports = async client => {
 					statusCode: 401,
 				});
 			}
-			const guildMember = await guild.members.fetch(userId);
+			const guildMember = await fetchMember(guild, userId);
 			const isAdmin = await getPrivilegeLevel(guildMember) >= 2;
 			if (!isAdmin) {
 				return res.code(403).send({
@@ -109,8 +118,14 @@ module.exports = async client => {
 
 				});
 			}
+			req.guildMember = guildMember;
 		} catch (err) {
-			res.send(err);
+			client.log.error(err);
+			return res.code(503).send({
+				error: 'Service Unavailable',
+				message: 'Unable to verify membership.',
+				statusCode: 503,
+			});
 		}
 	});
 

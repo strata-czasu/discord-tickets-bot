@@ -17,7 +17,9 @@ const emoji = require('node-emoji');
 const ms = require('ms');
 const ExtendedEmbedBuilder = require('../embed');
 const { logTicketEvent } = require('../logging');
-const { isStaff } = require('../users');
+const {
+	fetchMember, isStaff,
+} = require('../users');
 const { Collection } = require('discord.js');
 const spacetime = require('spacetime');
 
@@ -188,7 +190,8 @@ module.exports = class TicketManager {
 
 		/** @type {import("discord.js").Guild} */
 		const guild = this.client.guilds.cache.get(category.guild.id);
-		const member = interaction.member ?? await guild.members.fetch(interaction.user.id);
+		const member = interaction.member ?? await fetchMember(guild, interaction.user.id);
+		if (!member) throw new Error('You are no longer a member of this server.');
 		const getMessage = this.client.i18n.getLocale(category.guild.locale);
 
 		const rlKey = `ratelimits/guild-user:${category.guildId}-${interaction.user.id}`;
@@ -398,7 +401,8 @@ module.exports = class TicketManager {
 		/** @type {import("discord.js").Guild} */
 		const guild = this.client.guilds.cache.get(category.guild.id);
 		const getMessage = this.client.i18n.getLocale(category.guild.locale);
-		const creator = await guild.members.fetch(interaction.user.id);
+		const creator = await fetchMember(guild, interaction.user.id);
+		if (!creator) throw new Error('You are no longer a member of this server.');
 		const number = await this.getNextNumber(category.guild.id);
 		const channelName = category.channelName
 			.replace(/{+\s?(user)?name\s?}+/gi, creator.user.username)
@@ -1111,9 +1115,7 @@ module.exports = class TicketManager {
 
 		// if the creator isn't in the guild , close the ticket immediately
 		// (although leaving should cause the ticket to be closed anyway)
-		try {
-			await interaction.guild.members.fetch(ticket.createdById);
-		} catch {
+		if (!await fetchMember(interaction.guild, ticket.createdById)) {
 			return this.finallyClose(ticket.id, { reason });
 		}
 
@@ -1359,7 +1361,7 @@ module.exports = class TicketManager {
 		if (reason) dmEmbed.addFields(fields.reason);
 
 		try {
-			const creator = guild.members.cache.get(ticket.createdById);
+			const creator = await fetchMember(guild, ticket.createdById);
 			if (creator) {
 				await creator.send({
 					components,
