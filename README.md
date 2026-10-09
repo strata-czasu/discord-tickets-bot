@@ -82,6 +82,11 @@ or skip to the [full feature tour](https://discordtickets.app/features/).
 
 ## ⚡ Getting started
 
+For local development of this fork, run `nix develop` and `bun install`.
+The shell provides Bun 1.4.0 and Node 22; installation also builds our custom
+settings portal. The bot continues to run on Node. Our Docker workflow builds
+`linux/arm64/v8` on a native ARM64 runner and publishes to GHCR.
+
 > *🙏 Please read the [documentation](https://discordtickets.app/self-hosting/installation/) before you start.*
 
 There are 3 ways to get started with Discord Tickets:
@@ -141,12 +146,13 @@ or contribute in any other way, please read the [contributing guidelines](https:
 
 ## ⭐ Star History
 
-<details>
-  <summary>Show graph</summary>
-
-  [![Star History Chart](https://api.star-history.com/svg?repos=discord-tickets/bot&type=Date)](https://star-history.com/#discord-tickets/bot&Date)
-
-</details>
+<a href="https://star-history.dera.page/#discord-tickets/bot">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=discord-tickets/bot&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=discord-tickets/bot" />
+   <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=discord-tickets/bot" />
+ </picture>
+</a>
 
 ## 🥱 License
 
