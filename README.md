@@ -65,7 +65,7 @@
 - 🤖 **Automation** - ease your staff team's workload with configurable automation
   - 🏷️ [**Tags**](https://v4--discordtickets.netlify.app/features/#tags) - resolve members' problems without escalating to tickets
   - 🎫 **Tickets** - close inactive tickets automatically
-- 📜 **Archiving** - store messages in the database and view transcripts later
+- 📦 **Historical data export** - retain and export previously archived ticket data
 - ❓ **Context** - ask for a topic or up to 5 custom questions before creating a ticket, and see references to a message or previous ticket at a glance
 - 🗃️ **Organisation** - claim, release, move and transfer tickets between members and categories
 - 🌎 [**Internationalisation**](#-translating) - available in more than 10 languages
@@ -86,6 +86,19 @@ For local development of this fork, run `nix develop` and `bun install`.
 The shell provides Bun 1.4.0 and Node 22; installation also builds our custom
 settings portal. The bot continues to run on Node. Our Docker workflow builds
 `linux/arm64/v8` on a native ARM64 runner and publishes to GHCR.
+
+This fork runs without privileged Discord intents. Slash commands, buttons,
+modals, manual `/tag` replies, and message activity tracking remain available.
+New message archives, transcripts, regex auto-tags, and staff-online notices
+are disabled. Existing archived data and the encryption key must be retained;
+administrators can still export it through the settings portal.
+
+Ticket creators are checked at startup and every 15 minutes. Confirmed server
+departures close their open tickets; temporary Discord errors are retried.
+Working-hours notices and the bot's own status remain available. New tickets
+leave the archive-derived message count unset; existing stored counts are kept.
+On startup the bot removes the retired `/transcript` command. Existing transcript
+buttons explain that the feature is disabled.
 
 > *🙏 Please read the [documentation](https://discordtickets.app/self-hosting/installation/) before you start.*
 
