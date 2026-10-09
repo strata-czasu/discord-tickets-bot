@@ -32,7 +32,6 @@ presence:
       type: 3
   interval: 20
   status: online
-stats: true
 templates:
   transcript: transcript.md
 updates: true

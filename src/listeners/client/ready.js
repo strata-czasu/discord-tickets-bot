@@ -5,7 +5,6 @@ const checkForUpdates = require('../../lib/updates');
 const {
 	getAverageTimes,
 	getAverageRating,
-	sendToHouston,
 } = require('../../lib/stats');
 const handleStaleTickets = require('../../lib/stale');
 const handleDepartedTickets = require('../../lib/departed');
@@ -112,12 +111,6 @@ module.exports = class extends Listener {
 			if (client.config.presence.activities.length > 1) setInterval(() => setPresence(), client.config.presence.interval * 1000);
 		} else {
 			client.log.info('Presence activities are disabled');
-		}
-
-		// stats posting
-		if (client.config.stats) {
-			sendToHouston(client);
-			setInterval(() => sendToHouston(client), ms('12h'));
 		}
 
 		if (client.config.updates) {
