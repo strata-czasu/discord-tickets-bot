@@ -1,6 +1,7 @@
 {
-	"name": "discord-tickets",
-	"version": "4.0.47",
+	"name": "@discord-tickets/bot",
+	"version": "4.0.52",
+	"packageManager": "bun@1.4.0",
 	"private": "true",
 	"description": "The most popular open-source ticket management bot for Discord.",
 	"main": "src/",
@@ -14,7 +15,7 @@
 		"keygen": "node scripts/keygen",
 		"lint": "eslint src scripts --fix",
 		"preinstall": "node scripts/preinstall",
-		"postinstall": "node scripts/postinstall",
+		"postinstall": "node scripts/build-settings && node scripts/postinstall",
 		"start": "node .",
 		"studio": "npx prisma studio",
 		"test": "node scripts/check-i18n",
@@ -49,7 +50,7 @@
 		"node": ">=18"
 	},
 	"dependencies": {
-		"@discord-tickets/settings": "github:strata-czasu/discord-tickets-portal",
+		"@discord-tickets/settings": "github:strata-czasu/discord-tickets-portal#a83ec8e7c217728fadb20c2fbe65084895fb95cc",
 		"@eartharoid/dbf": "^0.4.2",
 		"@eartharoid/dtf": "^2.0.1",
 		"@eartharoid/i18n": "^1.2.1",
@@ -57,7 +58,7 @@
 		"@fastify/jwt": "^9.0.4",
 		"@fastify/multipart": "^9.0.3",
 		"@prisma/client": "^5.22.0",
-		"@sentry/node": "^9.38.0",
+		"@sentry/node": "^9.41.0",
 		"@sentry/profiling-node": "^9.38.0",
 		"archiver": "^7.0.1",
 		"boxen": "^7.1.1",
@@ -100,6 +101,18 @@
 		"markdown-table": "^3.0.4",
 		"nodemon": "^2.0.22"
 	},
+	"trustedDependencies": [
+		"@discord-tickets/settings",
+		"@prisma/client",
+		"@prisma/engines",
+		"@sentry-internal/node-cpu-profiler",
+		"bufferutil",
+		"erlpack",
+		"esbuild",
+		"prisma",
+		"utf-8-validate",
+		"zlib-sync"
+	],
 	"optionalDependencies": {
 		"bufferutil": "^4.0.9",
 		"erlpack": "github:discord/erlpack",
