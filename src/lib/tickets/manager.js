@@ -1,6 +1,5 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable max-lines */
-const TicketArchiver = require('./archiver');
 const {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -22,6 +21,7 @@ const {
 } = require('../users');
 const { Collection } = require('discord.js');
 const spacetime = require('spacetime');
+const { getReference } = require('./references');
 
 const { getSUID } = require('../logging');
 const {
@@ -48,7 +48,6 @@ module.exports = class TicketManager {
 	constructor(client) {
 		/** @type {import("client")} */
 		this.client = client;
-		this.archiver = new TicketArchiver(client);
 		this.$count = { categories: {} };
 		this.$numbers = {};
 		this.$stale = new Collection();
@@ -571,50 +570,34 @@ module.exports = class TicketManager {
 			})
 			.catch(this.client.log.error);
 
-		/** @type {import("discord.js").Message|undefined} */
-		let message;
 		if (referencesMessageId) {
-			/** @type {import("discord.js").Message} */
-			message = await interaction.channel.messages.fetch(referencesMessageId);
-			if (message) {
-				// not worth the effort of making system messages work atm
-				if (message.system || !message.content) {
-					referencesMessageId = null;
-					message = null;
-				} else {
-					if (!message.member) {
-						try {
-							message.member = await message.guild.members.fetch(message.author.id);
-						} catch {
-							this.client.log.verbose('Failed to fetch member %s of %s', message.author.id, message.guild.id);
-						}
-					}
-					channel.send({
-						embeds: [
-							new ExtendedEmbedBuilder()
-								.setColor(category.guild.primaryColour)
-								.setTitle(getMessage('ticket.references_message.title'))
-								.setDescription(
-									getMessage('ticket.references_message.description', {
-										author: message.author.toString(),
-										timestamp: `<t:${Math.ceil(message.createdTimestamp / 1000)}:R>`,
-										url: message.url,
-									})),
-							new ExtendedEmbedBuilder({
-								iconURL: guild.iconURL(),
-								text: category.guild.footer,
-							})
-								.setColor(category.guild.primaryColour)
-								.setAuthor({
-									iconURL: message.member?.displayAvatarURL(),
-									name: message.member?.displayName || 'Unknown',
-								})
-								.setDescription(message.content.substring(0, 1000) + (message.content.length > 1000 ? '...' : '')),
-						],
-					}).catch(this.client.log.error);
-				}
-
+			const reference = await getReference(interaction, referencesMessageId);
+			const url = reference?.url || `https://discord.com/channels/${guild.id}/${interaction.channel.id}/${referencesMessageId}`;
+			const embed = new ExtendedEmbedBuilder()
+				.setColor(category.guild.primaryColour)
+				.setTitle(getMessage('ticket.references_message.title'))
+				.setDescription(url);
+			if (reference) {
+				embed.setDescription(getMessage('ticket.references_message.description', {
+					author: reference.author,
+					timestamp: `<t:${Math.ceil(reference.createdTimestamp / 1000)}:R>`,
+					url,
+				}));
 			}
+			const referenceEmbeds = [embed];
+			if (reference?.content) {
+				referenceEmbeds.push(new ExtendedEmbedBuilder({
+					iconURL: guild.iconURL(),
+					text: category.guild.footer,
+				})
+					.setColor(category.guild.primaryColour)
+					.setAuthor({
+						iconURL: reference.avatar,
+						name: reference.displayName,
+					})
+					.setDescription(reference.content.substring(0, 1000) + (reference.content.length > 1000 ? '...' : '')));
+			}
+			channel.send({ embeds: referenceEmbeds }).catch(this.client.log.error);
 		} else if (referencesTicketId) {
 			// TODO: add portal url
 			const ticket = await this.client.prisma.ticket.findUnique({ where: { id: referencesTicketId } });
@@ -645,25 +628,7 @@ module.exports = class TicketManager {
 						value: await crypto.queue(w => w.decrypt(ticket.topic)),
 					});
 				}
-				channel.send({
-					components: category.guild.archive
-						? [
-							new ActionRowBuilder()
-								.addComponents(
-									new ButtonBuilder()
-										.setCustomId(JSON.stringify({
-											action: 'transcript',
-											ticket: referencesTicketId,
-										}))
-										.setStyle(ButtonStyle.Primary)
-										.setEmoji(getMessage('buttons.transcript.emoji'))
-										.setLabel(getMessage('buttons.transcript.text')),
-
-								),
-						]
-						: [],
-					embeds: [embed],
-				}).catch(this.client.log.error);
+				channel.send({ embeds: [embed] }).catch(this.client.log.error);
 			}
 		}
 
@@ -681,6 +646,7 @@ module.exports = class TicketManager {
 			openingMessageId: sent.id,
 			topic: topic ? await crypto.queue(w => w.encrypt(topic)) : null,
 		};
+		if (referencesMessageId) data.referencesMessageId = referencesMessageId;
 		if (referencesTicketId) data.referencesTicket = { connect: { id: referencesTicketId } };
 		if (answers) data.questionAnswers = { createMany: { data: answers } };
 
@@ -707,18 +673,6 @@ module.exports = class TicketManager {
 				const expiresAt = ticket.createdAt.getTime() + category.cooldown;
 				const TTL = category.cooldown;
 				await this.client.keyv.set(cacheKey, expiresAt, TTL);
-			}
-
-			if (category.guild.archive && message) {
-				if (
-					await this.client.prisma.archivedMessage.findUnique({ where: { id: message.id } }) ||
-					await this.archiver.saveMessage(ticket.id, message, true)
-				) {
-					await this.client.prisma.ticket.update({
-						data: { referencesMessageId: message.id },
-						where: { id: ticket.id },
-					});
-				}
 			}
 
 			logTicketEvent(this.client, {
@@ -1228,11 +1182,6 @@ module.exports = class TicketManager {
 		let ticket = await this.getTicket(ticketId);
 		const getMessage = this.client.i18n.getLocale(ticket.guild.locale);
 
-		const { _count: { archivedMessages } } = await this.client.prisma.ticket.findUnique({
-			select: { _count: { select: { archivedMessages: true } } },
-			where: { id: ticket.id },
-		});
-
 		/** @type {import("@prisma/client").Ticket} */
 		const data = {
 			closedAt: new Date(),
@@ -1243,7 +1192,6 @@ module.exports = class TicketManager {
 				},
 			} || undefined, // Prisma wants undefined not null because it is a relation
 			closedReason: reason && await crypto.queue(w => w.encrypt(reason)),
-			messageCount: archivedMessages,
 			open: false,
 		};
 
@@ -1281,23 +1229,6 @@ module.exports = class TicketManager {
 		}
 
 		const components = [];
-
-		if (ticket.guild.archive) {
-			components.push(
-				new ActionRowBuilder()
-					.addComponents(
-						new ButtonBuilder()
-							.setCustomId(JSON.stringify({
-								action: 'transcript',
-								ticket: ticket.id,
-							}))
-							.setStyle(ButtonStyle.Primary)
-							.setEmoji(getMessage('buttons.transcript.emoji'))
-							.setLabel(getMessage('buttons.transcript.text')),
-
-					),
-			);
-		}
 
 		const fields = {
 			closed: {

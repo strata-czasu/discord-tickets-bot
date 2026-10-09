@@ -1,5 +1,6 @@
 const ms = require('ms');
 const { logAdminEvent } = require('../../../../../../lib/logging');
+const { checkTagSettings } = require('../../../../../../lib/content-settings');
 
 module.exports.delete = fastify => ({
 	handler: async (req, res) => {
@@ -61,6 +62,7 @@ module.exports.patch = fastify => ({
 		const tagId = Number(req.params.tag);
 		const guild = client.guilds.cache.get(req.params.guild);
 		const data = req.body;
+		checkTagSettings(data);
 
 		const original = req.params.tag && await client.prisma.tag.findUnique({ where: { id: tagId } });
 

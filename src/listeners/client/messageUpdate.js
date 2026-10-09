@@ -25,6 +25,7 @@ module.exports = class extends Listener {
 				newMessage = await newMessage.fetch();
 			} catch (error) {
 				client.log.error(error);
+				return;
 			}
 		}
 
@@ -38,24 +39,10 @@ module.exports = class extends Listener {
 		});
 		if (!ticket) return;
 
-		if (ticket.guild.archive) {
-			try {
-				await client.tickets.archiver.saveMessage(ticket.id, newMessage);
-			} catch (error) {
-				client.log.warn('Failed to update archived message', newMessage.id);
-				client.log.error(error);
-				newMessage.react('❌').catch(client.log.error);
-			}
-		}
-
 		if (newMessage.author.id === client.user.id) return;
 
 		await logMessageEvent(this.client, {
 			action: 'update',
-			diff: {
-				original: { content: oldMessage.cleanContent },
-				updated: { content: newMessage.cleanContent },
-			},
 			target: newMessage,
 			ticket,
 		});

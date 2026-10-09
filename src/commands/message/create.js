@@ -1,5 +1,6 @@
 const { MessageCommand } = require('@eartharoid/dbf');
 const { useGuild } = require('../../lib/tickets/utils');
+const { captureReference } = require('../../lib/tickets/references');
 
 module.exports = class CreateMessageCommand extends MessageCommand {
 	constructor(client, options) {
@@ -18,6 +19,7 @@ module.exports = class CreateMessageCommand extends MessageCommand {
 	 * @param {import("discord.js").MessageContextMenuCommandInteraction} interaction
 	 */
 	async run(interaction) {
+		await captureReference(interaction);
 		await useGuild(this.client, interaction, { referencesMessageId: interaction.targetId });
 	}
 };

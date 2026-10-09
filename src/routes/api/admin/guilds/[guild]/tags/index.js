@@ -1,5 +1,6 @@
 const ms = require('ms');
 const { logAdminEvent } = require('../../../../../../lib/logging');
+const { checkTagSettings } = require('../../../../../../lib/content-settings');
 
 module.exports.get = fastify => ({
 	handler: async req => {
@@ -23,6 +24,7 @@ module.exports.post = fastify => ({
 		const client = req.routeOptions.config.client;
 		const guild = client.guilds.cache.get(req.params.guild);
 		const data = req.body;
+		checkTagSettings(data);
 		const tag = await client.prisma.tag.create({
 			data: {
 				...data,

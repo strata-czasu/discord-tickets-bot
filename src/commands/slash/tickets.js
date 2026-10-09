@@ -167,10 +167,6 @@ module.exports = class TicketsSlashCommand extends SlashCommand {
 			.setTitle(getMessage(`commands.slash.tickets.response.title.${ownOrOther}`, { displayName: member.displayName }))
 			.setFields(fields);
 
-		if (settings.archive && process.env.OVERRIDE_ARCHIVE !== 'false') {
-			const transcriptCommand = client.application.commands.cache.find(c => c.name === 'transcript');
-			embed.setDescription(getMessage('commands.slash.tickets.response.description', { transcript: `</${transcriptCommand.name}:${transcriptCommand.id}>` }));
-		}
 
 		return await interaction.editReply({ embeds: [embed] });
 	}

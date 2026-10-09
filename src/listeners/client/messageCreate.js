@@ -186,15 +186,6 @@ module.exports = class extends Listener {
 			let ticket = await client.prisma.ticket.findUnique({ where: { id: message.channel.id } });
 
 			if (ticket) {
-				// archive messages
-				if (settings.archive) {
-					client.tickets.archiver.saveMessage(ticket.id, message)
-						.catch(error => {
-							client.log.warn('Failed to archive message', message.id);
-							client.log.error(error);
-							message.react('❌').catch(client.log.error);
-						});
-				}
 
 				if (!message.author.bot) {
 					// update user's message count
@@ -256,44 +247,6 @@ module.exports = class extends Listener {
 				}
 			}
 
-			// auto-tag
-			if (
-				!message.author.bot &&
-				(
-					(settings.autoTag === 'all') ||
-					(settings.autoTag === 'ticket' && ticket) ||
-					(settings.autoTag === '!ticket' && !ticket) ||
-					(settings.autoTag.includes(message.channel.id))
-				)
-			) {
-				const cacheKey = `cache/guild-tags:${message.guild.id}`;
-				let tags = await client.keyv.get(cacheKey);
-				if (!tags) {
-					tags = (await client.prisma.tag.findMany({
-						select: {
-							content: true,
-							id: true,
-							name: true,
-							regex: true,
-						},
-						where: { guildId: message.guild.id },
-					}))
-						.sort((a, b) => (b.regex ? b.regex.length : 0) - (a.regex ? a.regex.length : 0));
-					client.keyv.set(cacheKey, tags, ms('1h'));
-				}
-
-				const tag = tags.find(tag => tag.regex && message.content.match(new RegExp(tag.regex, 'mi')));
-				if (tag) {
-					await message.reply({
-						embeds: [
-							new EmbedBuilder()
-								.setColor(settings.primaryColour)
-								.setDescription(tag.content),
-						],
-					});
-				}
-
-			}
 		}
 	}
 };
