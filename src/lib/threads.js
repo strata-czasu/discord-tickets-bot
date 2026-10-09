@@ -70,7 +70,6 @@ const pools = {
 	export: reusablePool(.33, 'export'),
 	import: reusablePool(.33, 'import'),
 	stats: reusablePool(.25, 'stats'),
-	transcript: reusablePool(.5, 'transcript'),
 };
 
 module.exports = {

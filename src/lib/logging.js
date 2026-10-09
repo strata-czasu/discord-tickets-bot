@@ -208,7 +208,7 @@ async function logMessageEvent(client, {
 			? 'DarkPurple' : 'Default';
 	const getMessage = client.i18n.getLocale(ticket.guild.locale);
 	const i18nOptions = {
-		user: `<@${executor?.user.id}>`,
+		user: executor?.user.id || target.author?.id ? `<@${executor?.user.id || target.author.id}>` : 'Unknown',
 		verb: getMessage(`log.message.verb.${action}`),
 	};
 	const channel = client.channels.cache.get(ticket.guild.logChannel);
@@ -217,8 +217,8 @@ async function logMessageEvent(client, {
 		new EmbedBuilder()
 			.setColor(colour)
 			.setAuthor({
-				iconURL: target.member?.displayAvatarURL() || 'https://discord.com/assets/1f0bfc0865d324c2587920a7d80c609b.png',
-				name: target.member?.displayName || 'Unknown',
+				iconURL: target.member?.displayAvatarURL() || target.author?.displayAvatarURL() || 'https://discord.com/assets/1f0bfc0865d324c2587920a7d80c609b.png',
+				name: target.member?.displayName || target.author?.username || 'Unknown',
 			})
 			.setTitle(getMessage('log.message.title', i18nOptions))
 			.setDescription(getMessage('log.message.description', i18nOptions))

@@ -1,5 +1,6 @@
 const { logAdminEvent } = require('../../../../../lib/logging.js');
 const { Colors } = require('discord.js');
+const { checkGuildSettings } = require('../../../../../lib/content-settings');
 
 module.exports.get = fastify => ({
 	handler: async req => {
@@ -17,6 +18,7 @@ module.exports.get = fastify => ({
 module.exports.patch = fastify => ({
 	handler: async req => {
 		const data = req.body;
+		checkGuildSettings(data);
 		if (Object.prototype.hasOwnProperty.call(data, 'id')) delete data.id;
 		if (Object.prototype.hasOwnProperty.call(data, 'createdAt')) delete data.createdAt;
 		const colours = ['errorColour', 'primaryColour', 'successColour'];

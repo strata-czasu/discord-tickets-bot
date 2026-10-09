@@ -1,4 +1,5 @@
 const { Button } = require('@eartharoid/dbf');
+const { MessageFlags } = require('discord.js');
 
 module.exports = class ClaimButton extends Button {
 	constructor(client, options) {
@@ -13,10 +14,9 @@ module.exports = class ClaimButton extends Button {
 	 * @param {import("discord.js").ChatInputCommandInteraction} interaction
 	 */
 	async run(id, interaction) {
-		/** @type {import("client")} */
-		const client = this.client;
-
-		const cmd = client.commands.commands.slash.get('transcript');
-		return await cmd.run(interaction, id.ticket);
+		return interaction.reply({
+			content: 'Transcripts are currently disabled. Previously archived data is retained and can be exported by a server administrator.',
+			flags: MessageFlags.Ephemeral,
+		});
 	}
 };
