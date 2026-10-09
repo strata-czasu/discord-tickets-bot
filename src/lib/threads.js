@@ -7,23 +7,6 @@ const {
 const { cpus } = require('node:os');
 
 /**
- * Create a single-use thread pool
- * @param {number} num fraction of available CPUs to use (ceil'd), or absolute number
- * @param {string} name name of file in workers directory
- * @param {function} fun async function
- * @param {import('threads/dist/master/pool').PoolOptions} options
- * @returns {Promise<any>}
- */
-async function quickPool(num, name, fun, options) {
-	const pool = reusablePool(num, name, options);
-	try {
-		return await fun(pool);
-	} finally {
-		pool.settled().then(() => pool.terminate());
-	}
-};
-
-/**
  * Create a multi-use thread pool
  * @param {number} num fraction of available CPUs to use (ceil'd), or absolute number
  * @param {string} name name of file in workers directory
@@ -75,7 +58,6 @@ const pools = {
 module.exports = {
 	pools,
 	quick,
-	quickPool,
 	reusable,
 	reusablePool,
 };
