@@ -50,7 +50,7 @@
 		"node": ">=18"
 	},
 	"dependencies": {
-		"@discord-tickets/settings": "github:strata-czasu/discord-tickets-portal#8d2b93c3cb7dd849c9ba064a0e0bee8ebe16839b",
+		"@discord-tickets/settings": "github:strata-czasu/discord-tickets-portal#cbd8740f30ab2a16482fba4bb284de67289aa872",
 		"@eartharoid/dbf": "^0.4.2",
 		"@eartharoid/dtf": "^2.0.1",
 		"@eartharoid/i18n": "^1.2.1",
