@@ -19,16 +19,11 @@ module.exports = class Client extends FrameworkClient {
 		super(
 			{
 				intents: [
-					...[
-						GatewayIntentBits.DirectMessages,
-						GatewayIntentBits.DirectMessageReactions,
-						GatewayIntentBits.DirectMessageTyping,
-						GatewayIntentBits.MessageContent,
-						GatewayIntentBits.Guilds,
-						GatewayIntentBits.GuildMembers,
-						GatewayIntentBits.GuildMessages,
-					],
-					...(process.env.PUBLIC_BOT !== 'true' ? [GatewayIntentBits.GuildPresences] : []),
+					GatewayIntentBits.DirectMessages,
+					GatewayIntentBits.DirectMessageReactions,
+					GatewayIntentBits.DirectMessageTyping,
+					GatewayIntentBits.Guilds,
+					GatewayIntentBits.GuildMessages,
 				],
 				partials: [
 					Partials.Channel,

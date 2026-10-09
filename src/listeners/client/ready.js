@@ -49,6 +49,15 @@ module.exports = class extends Listener {
 
 		// commands are not cached automatically
 		await client.application.commands.fetch();
+		const transcriptCommand = client.application.commands.cache.find(command => command.name === 'transcript');
+		if (transcriptCommand) {
+			try {
+				await client.application.commands.delete(transcriptCommand.id);
+				client.log.info('Removed the retired /transcript command');
+			} catch (error) {
+				client.log.error(error);
+			}
+		}
 
 		// presence/activity
 		if (client.config.presence.activities?.length > 0) {
